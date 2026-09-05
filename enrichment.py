@@ -3,10 +3,8 @@ Enrichment Feature Implementation for prostate-biopsy-gleason-agent.
 Generated based on domain-specific requirements in specifications.
 """
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 import datetime
-import math
-import json
 
 # =============================================================================
 # 1. OVERVIEW
@@ -109,11 +107,11 @@ class Enrichment1GleasonGradeGroupGgg15ClassificationAgent:
         return res
 
 # =============================================================================
-# 3. IMPLEMENTATION
+# 3. IMPLEMENTATION: GLEASON GRADE GROUP
 # =============================================================================
 @dataclass
-class ImplementationEngineResult:
-    feature_name: str = "Implementation"
+class GradeGroupImplementationResult:
+    feature_name: str = "Grade Group Implementation"
     status: str = "OPTIMAL"
     score: float = 0.0
     metrics: Dict[str, Any] = field(default_factory=dict)
@@ -121,16 +119,16 @@ class ImplementationEngineResult:
     recommendations: List[str] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
-class ImplementationEngine:
+class GradeGroupImplementationEngine:
     """
-    Implementation: **File**: prostate_biopsy_gleason/grade_group.py (new file)
+    Implementation engine for Gleason Grade Group (GGG) 1-5 classification.
     """
     def __init__(self, threshold: float = 1.0, config: Optional[Dict[str, Any]] = None):
         self.threshold = threshold
         self.config = config or {}
-        self.history: List[ImplementationEngineResult] = []
+        self.history: List[GradeGroupImplementationResult] = []
 
-    def evaluate(self, primary_value: float, secondary_value: float = 0.0, **kwargs) -> ImplementationEngineResult:
+    def evaluate(self, primary_value: float, secondary_value: float = 0.0, **kwargs) -> GradeGroupImplementationResult:
         alerts = []
         recs = []
         status = "OPTIMAL"
@@ -138,17 +136,17 @@ class ImplementationEngine:
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
-            alerts.append(f"Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
+            alerts.append(f"Grade Group Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
             recs.append("Initiate immediate protocol review and escalate to attending lead.")
         elif primary_value > self.threshold:
             status = "WARNING"
-            alerts.append(f"Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
+            alerts.append(f"Grade Group Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
             recs.append("Increase monitoring frequency and perform secondary verification.")
         else:
             recs.append("Parameters nominal under standard operating bounds.")
 
-        res = ImplementationEngineResult(
-            feature_name="Implementation",
+        res = GradeGroupImplementationResult(
+            feature_name="Grade Group Implementation",
             status=status,
             score=score,
             metrics={"primary": primary_value, "secondary": secondary_value, **kwargs},
@@ -209,11 +207,11 @@ class Enrichment2Gs7SubtypeDetection34Vs43Engine:
         return res
 
 # =============================================================================
-# 5. IMPLEMENTATION
+# 5. IMPLEMENTATION: GS7 SUBTYPE DETECTION
 # =============================================================================
 @dataclass
-class ImplementationEngineResult:
-    feature_name: str = "Implementation"
+class Gs7SubtypeImplementationResult:
+    feature_name: str = "GS7 Subtype Implementation"
     status: str = "OPTIMAL"
     score: float = 0.0
     metrics: Dict[str, Any] = field(default_factory=dict)
@@ -221,16 +219,16 @@ class ImplementationEngineResult:
     recommendations: List[str] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
-class ImplementationEngine:
+class Gs7SubtypeImplementationEngine:
     """
-    Implementation: **File**: prostate_biopsy_gleason/gs7_subtypes.py (new file)
+    Implementation engine for GS7 Subtype Detection (3+4 vs 4+3).
     """
     def __init__(self, threshold: float = 1.0, config: Optional[Dict[str, Any]] = None):
         self.threshold = threshold
         self.config = config or {}
-        self.history: List[ImplementationEngineResult] = []
+        self.history: List[Gs7SubtypeImplementationResult] = []
 
-    def evaluate(self, primary_value: float, secondary_value: float = 0.0, **kwargs) -> ImplementationEngineResult:
+    def evaluate(self, primary_value: float, secondary_value: float = 0.0, **kwargs) -> Gs7SubtypeImplementationResult:
         alerts = []
         recs = []
         status = "OPTIMAL"
@@ -238,17 +236,17 @@ class ImplementationEngine:
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
-            alerts.append(f"Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
+            alerts.append(f"GS7 Subtype Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
             recs.append("Initiate immediate protocol review and escalate to attending lead.")
         elif primary_value > self.threshold:
             status = "WARNING"
-            alerts.append(f"Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
+            alerts.append(f"GS7 Subtype Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
             recs.append("Increase monitoring frequency and perform secondary verification.")
         else:
             recs.append("Parameters nominal under standard operating bounds.")
 
-        res = ImplementationEngineResult(
-            feature_name="Implementation",
+        res = Gs7SubtypeImplementationResult(
+            feature_name="GS7 Subtype Implementation",
             status=status,
             score=score,
             metrics={"primary": primary_value, "secondary": secondary_value, **kwargs},
@@ -309,11 +307,11 @@ class Enrichment3Who2019ProtocolComplianceCheckerEngine:
         return res
 
 # =============================================================================
-# 7. IMPLEMENTATION
+# 7. IMPLEMENTATION: WHO COMPLIANCE
 # =============================================================================
 @dataclass
-class ImplementationEngineResult:
-    feature_name: str = "Implementation"
+class WhoComplianceImplementationResult:
+    feature_name: str = "WHO Compliance Implementation"
     status: str = "OPTIMAL"
     score: float = 0.0
     metrics: Dict[str, Any] = field(default_factory=dict)
@@ -321,16 +319,16 @@ class ImplementationEngineResult:
     recommendations: List[str] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
-class ImplementationEngine:
+class WhoComplianceImplementationEngine:
     """
-    Implementation: **File**: prostate_biopsy_gleason/who_compliance.py (new file)
+    Implementation engine for WHO 2019 Protocol Compliance Checking.
     """
     def __init__(self, threshold: float = 1.0, config: Optional[Dict[str, Any]] = None):
         self.threshold = threshold
         self.config = config or {}
-        self.history: List[ImplementationEngineResult] = []
+        self.history: List[WhoComplianceImplementationResult] = []
 
-    def evaluate(self, primary_value: float, secondary_value: float = 0.0, **kwargs) -> ImplementationEngineResult:
+    def evaluate(self, primary_value: float, secondary_value: float = 0.0, **kwargs) -> WhoComplianceImplementationResult:
         alerts = []
         recs = []
         status = "OPTIMAL"
@@ -338,17 +336,17 @@ class ImplementationEngine:
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
-            alerts.append(f"Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
+            alerts.append(f"WHO Compliance Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
             recs.append("Initiate immediate protocol review and escalate to attending lead.")
         elif primary_value > self.threshold:
             status = "WARNING"
-            alerts.append(f"Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
+            alerts.append(f"WHO Compliance Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
             recs.append("Increase monitoring frequency and perform secondary verification.")
         else:
             recs.append("Parameters nominal under standard operating bounds.")
 
-        res = ImplementationEngineResult(
-            feature_name="Implementation",
+        res = WhoComplianceImplementationResult(
+            feature_name="WHO Compliance Implementation",
             status=status,
             score=score,
             metrics={"primary": primary_value, "secondary": secondary_value, **kwargs},
@@ -414,25 +412,25 @@ class Enrichment4NumberOfCoresWithPattern4TrackingEngine:
 class ProstatebiopsygleasonagentEnrichmentSuite:
     """Master coordinator executing all enriched domain features."""
     def __init__(self):
-        self.overviewengine = OverviewEngine()
-        self.enrichment1gleasongr = Enrichment1GleasonGradeGroupGgg15ClassificationAgent()
-        self.implementationengine = ImplementationEngine()
-        self.enrichment2gs7subtyp = Enrichment2Gs7SubtypeDetection34Vs43Engine()
-        self.implementationengine = ImplementationEngine()
-        self.enrichment3who2019pr = Enrichment3Who2019ProtocolComplianceCheckerEngine()
-        self.implementationengine = ImplementationEngine()
-        self.enrichment4numberofc = Enrichment4NumberOfCoresWithPattern4TrackingEngine()
+        self.overview_engine = OverviewEngine()
+        self.grade_group_classifier = Enrichment1GleasonGradeGroupGgg15ClassificationAgent()
+        self.grade_group_impl = GradeGroupImplementationEngine()
+        self.gs7_subtype = Enrichment2Gs7SubtypeDetection34Vs43Engine()
+        self.gs7_subtype_impl = Gs7SubtypeImplementationEngine()
+        self.who_compliance = Enrichment3Who2019ProtocolComplianceCheckerEngine()
+        self.who_compliance_impl = WhoComplianceImplementationEngine()
+        self.pattern4_tracker = Enrichment4NumberOfCoresWithPattern4TrackingEngine()
 
     def execute_all(self, primary_val: float = 1.5, secondary_val: float = 0.5) -> Dict[str, Any]:
         results = {}
-        results["OverviewEngine"] = self.overviewengine.evaluate(primary_val, secondary_val)
-        results["Enrichment1GleasonGradeGroupGgg15ClassificationAgent"] = self.enrichment1gleasongr.evaluate(primary_val, secondary_val)
-        results["ImplementationEngine"] = self.implementationengine.evaluate(primary_val, secondary_val)
-        results["Enrichment2Gs7SubtypeDetection34Vs43Engine"] = self.enrichment2gs7subtyp.evaluate(primary_val, secondary_val)
-        results["ImplementationEngine"] = self.implementationengine.evaluate(primary_val, secondary_val)
-        results["Enrichment3Who2019ProtocolComplianceCheckerEngine"] = self.enrichment3who2019pr.evaluate(primary_val, secondary_val)
-        results["ImplementationEngine"] = self.implementationengine.evaluate(primary_val, secondary_val)
-        results["Enrichment4NumberOfCoresWithPattern4TrackingEngine"] = self.enrichment4numberofc.evaluate(primary_val, secondary_val)
+        results["Overview"] = self.overview_engine.evaluate(primary_val, secondary_val)
+        results["GradeGroupClassifier"] = self.grade_group_classifier.evaluate(primary_val, secondary_val)
+        results["GradeGroupImplementation"] = self.grade_group_impl.evaluate(primary_val, secondary_val)
+        results["Gs7Subtype"] = self.gs7_subtype.evaluate(primary_val, secondary_val)
+        results["Gs7SubtypeImplementation"] = self.gs7_subtype_impl.evaluate(primary_val, secondary_val)
+        results["WhoCompliance"] = self.who_compliance.evaluate(primary_val, secondary_val)
+        results["WhoComplianceImplementation"] = self.who_compliance_impl.evaluate(primary_val, secondary_val)
+        results["Pattern4Tracker"] = self.pattern4_tracker.evaluate(primary_val, secondary_val)
         return results
 
 # Global instance

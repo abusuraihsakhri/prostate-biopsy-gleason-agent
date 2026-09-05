@@ -9,11 +9,11 @@ import pytest
 from enrichment import (
     OverviewEngine,
     Enrichment1GleasonGradeGroupGgg15ClassificationAgent,
-    ImplementationEngine,
+    GradeGroupImplementationEngine,
     Enrichment2Gs7SubtypeDetection34Vs43Engine,
-    ImplementationEngine,
+    Gs7SubtypeImplementationEngine,
     Enrichment3Who2019ProtocolComplianceCheckerEngine,
-    ImplementationEngine,
+    WhoComplianceImplementationEngine,
     Enrichment4NumberOfCoresWithPattern4TrackingEngine,
     ProstatebiopsygleasonagentEnrichmentSuite,
     enrichment_suite,
@@ -22,7 +22,8 @@ from enrichment import (
 def test_enrichment_suite_execution():
     suite = ProstatebiopsygleasonagentEnrichmentSuite()
     res = suite.execute_all(primary_val=0.5, secondary_val=0.2)
-    assert len(res) >= 1
+    # All 8 engines should produce results (no duplicate key overwrites)
+    assert len(res) == 8
     for k, v in res.items():
         assert v.status in ["OPTIMAL", "WARNING", "CRITICAL_ALERT"]
         assert isinstance(v.recommendations, list)
@@ -33,3 +34,15 @@ def test_enrichment_threshold_escalation():
     for k, v in res.items():
         assert v.status in ["WARNING", "CRITICAL_ALERT"]
         assert len(v.alerts) > 0
+
+def test_enrichment_suite_unique_keys():
+    """Verify all enrichment suite result keys are unique (no duplicate overwrites)."""
+    suite = ProstatebiopsygleasonagentEnrichmentSuite()
+    res = suite.execute_all(primary_val=1.5, secondary_val=0.5)
+    expected_keys = {
+        "Overview", "GradeGroupClassifier", "GradeGroupImplementation",
+        "Gs7Subtype", "Gs7SubtypeImplementation",
+        "WhoCompliance", "WhoComplianceImplementation",
+        "Pattern4Tracker",
+    }
+    assert set(res.keys()) == expected_keys

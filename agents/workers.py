@@ -4,8 +4,9 @@ Domain: Digital Pathology & Histology Systems
 Standard: CAP Cancer Protocols / DICOM WSI PS3.16
 """
 import uuid
-from typing import Dict, Any, List, Optional
-from .models import SystemTaskPayload, AgentAlert, UrgencyLevel, SystemIntegrityStatus
+from typing import List
+from .base import _validate_finite_metric
+from .models import SystemTaskPayload, AgentAlert, UrgencyLevel
 
 
 class InvariantQCWorker:
@@ -14,6 +15,7 @@ class InvariantQCWorker:
     @classmethod
     def evaluate(cls, payload: SystemTaskPayload) -> List[AgentAlert]:
         alerts = []
+        _validate_finite_metric(payload.primary_metric, "primary_metric")
         if payload.primary_metric > 25.0:
             alerts.append(AgentAlert(
                 alert_id=f"QC-{uuid.uuid4().hex[:6]}",
@@ -32,6 +34,7 @@ class SafetyEscalationWorker:
     @classmethod
     def evaluate(cls, payload: SystemTaskPayload) -> List[AgentAlert]:
         alerts = []
+        _validate_finite_metric(payload.secondary_metric, "secondary_metric")
         if payload.is_critical_flag or payload.secondary_metric > 12.0:
             alerts.append(AgentAlert(
                 alert_id=f"SAFE-{uuid.uuid4().hex[:6]}",

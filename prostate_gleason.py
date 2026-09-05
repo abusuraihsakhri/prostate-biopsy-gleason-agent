@@ -11,13 +11,13 @@ License: MIT
 import argparse
 import csv
 import datetime
-import json
+import enum
 import sys
 import uuid
 from typing import Dict, Any, List, Optional
 
 
-class Severity(str):
+class Severity(str, enum.Enum):
     INFO = "INFO"
     ADVISORY = "ADVISORY"
     WARNING = "WARNING"
@@ -65,11 +65,25 @@ class AgentAlert:
         }
 
 
+def _safe_float(value, name: str = "metric", default: float = 0.0) -> float:
+    """Safely convert a value to float, ensuring it's finite."""
+    import math
+    if value is None:
+        return default
+    try:
+        v = float(value)
+    except (TypeError, ValueError) as e:
+        raise ValueError(f"{name} must be a valid number: {e}")
+    if math.isnan(v) or math.isinf(v):
+        raise ValueError(f"{name} must be finite (got {v})")
+    return v
+
+
 class CoreMeasurementAgent:
     """Specialized Sub-Agent 1 for prostate-biopsy-gleason-agent"""
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
-        val1 = float(payload.get("metric_primary", 15.0))
+        val1 = _safe_float(payload.get("metric_primary"), "metric_primary", 15.0)
         if val1 > 20.0:
             alerts.append(
                 AgentAlert(
@@ -89,7 +103,7 @@ class GleasonPatternClassifierAgent:
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
         is_critical = bool(payload.get("critical_flag", False))
-        val2 = float(payload.get("metric_secondary", 5.0))
+        val2 = _safe_float(payload.get("metric_secondary"), "metric_secondary", 5.0)
         if is_critical or val2 > 12.0:
             alerts.append(
                 AgentAlert(

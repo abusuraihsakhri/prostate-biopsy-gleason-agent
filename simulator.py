@@ -1,9 +1,14 @@
 """
 Distributed Component High-Throughput Traffic & Stress Testing Simulator for Prostate Biopsy Gleason Agent.
 """
+import os
 import time
 import random
 import sys
+
+# Ensure audit key is set (production deployments should set AUDIT_SECRET_KEY env var)
+os.environ.setdefault("AUDIT_SECRET_KEY", "prostate-biopsy-gleason-agent-sim-key-2026")
+
 from agents.models import SystemTaskPayload
 from agents.supervisor import SystemSupervisor
 from agents.base import PHIGuard, SecurityException, AuditLogger

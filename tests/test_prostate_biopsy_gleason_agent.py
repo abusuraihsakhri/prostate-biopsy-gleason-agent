@@ -3,8 +3,13 @@ Automated Pytest Test Suite for Prostate Biopsy Gleason Agent.
 Domain: Digital Pathology & Histology Systems
 Standard: CAP Cancer Protocols / DICOM WSI PS3.16
 """
+import os
 import sys
 from pathlib import Path
+
+# Set audit key before importing agents.base (lazy singleton requires it on first use)
+os.environ.setdefault("AUDIT_SECRET_KEY", "test-audit-key-for-unit-tests-only")
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest

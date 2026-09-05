@@ -3,7 +3,6 @@ Command Line Interface for Prostate Biopsy Gleason Agent.
 """
 import argparse
 import csv
-import json
 import sys
 from agents.models import SystemTaskPayload
 from agents.supervisor import SystemSupervisor

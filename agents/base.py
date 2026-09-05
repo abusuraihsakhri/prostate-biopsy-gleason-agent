@@ -10,7 +10,6 @@ import hmac
 import hashlib
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
-from pydantic import BaseModel, Field
 
 PHI_PATTERNS = [
     re.compile(r"\b(?:MRN|mrn)[:#\s-]*\d{4,10}\b", re.IGNORECASE),
@@ -31,6 +30,25 @@ class SecurityException(Exception):
 class ResourceLimitExceededException(Exception):
     """Raised when computational parameters exceed safety bounds."""
     pass
+
+
+class ValidationError(Exception):
+    """Raised when input values fail validation checks."""
+    pass
+
+
+def _validate_finite_metric(value: float, name: str = "metric") -> float:
+    """Ensure a metric value is a finite number (not NaN, Inf, or None)."""
+    import math
+    if value is None:
+        raise ValidationError(f"{name} must not be None")
+    try:
+        v = float(value)
+    except (TypeError, ValueError) as e:
+        raise ValidationError(f"{name} must be a valid number: {e}")
+    if math.isnan(v) or math.isinf(v):
+        raise ValidationError(f"{name} must be finite (got {v})")
+    return v
 
 
 def assert_no_phi(text: str) -> None:
@@ -57,7 +75,13 @@ class PHIGuard:
 class AuditTrail:
     """Cryptographic Tamper-Evident HMAC-SHA256 Audit Trail."""
     def __init__(self, secret_key: Optional[str] = None):
-        self.secret_key = (secret_key or os.getenv("AUDIT_SECRET_KEY", "prostate-biopsy-gleason-agent-master-audit-key-2026")).encode("utf-8")
+        resolved_key = secret_key or os.getenv("AUDIT_SECRET_KEY")
+        if not resolved_key:
+            raise RuntimeError(
+                "AUDIT_SECRET_KEY environment variable is required for secure audit trail operation. "
+                "Set it before importing this module (e.g. os.environ['AUDIT_SECRET_KEY']=...)."
+            )
+        self.secret_key = resolved_key.encode("utf-8")
         self.logs: List[Dict[str, Any]] = []
 
     def log(self, actor: str, actor_tier: str, event_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
@@ -93,21 +117,29 @@ class AuditTrail:
         return self.logs
 
 
-GLOBAL_AUDIT = AuditTrail()
+_GLOBAL_AUDIT: Optional[AuditTrail] = None
+
+
+def _get_global_audit() -> AuditTrail:
+    """Lazy singleton — defers AUDIT_SECRET_KEY resolution until first use."""
+    global _GLOBAL_AUDIT
+    if _GLOBAL_AUDIT is None:
+        _GLOBAL_AUDIT = AuditTrail()
+    return _GLOBAL_AUDIT
 
 
 class AuditLogger:
     @staticmethod
     def log(actor: str, actor_tier: str, event_type: str, details: Dict[str, Any]) -> Dict[str, Any]:
-        return GLOBAL_AUDIT.log(actor, actor_tier, event_type, details)
+        return _get_global_audit().log(actor, actor_tier, event_type, details)
 
     @staticmethod
     def get_trail() -> List[Dict[str, Any]]:
-        return GLOBAL_AUDIT.get_trail()
+        return _get_global_audit().get_trail()
 
     @staticmethod
     def verify_integrity() -> bool:
-        return GLOBAL_AUDIT.verify_integrity()
+        return _get_global_audit().verify_integrity()
 
 
 class ActionExecutor:
