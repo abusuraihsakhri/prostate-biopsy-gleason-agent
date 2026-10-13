@@ -105,6 +105,6 @@ class BiopsyCoordinator:
         if "status" in q or "summary" in q:
             return f"ProstateBiopsy Gleason Sentinel: Autonomous Multi-Core ISUP Grade Grouping & Perineural Tracker currently tracking {len(self.case_registry)} cases in on-premises memory."
         elif "guideline" in q or "standard" in q:
-            return "Active clinical surveillance operates under CAP Cancer Protocols & ASCO/CAP 2023 validated protocols."
+            return "CAP protocols must be consulted independently; generic numeric thresholds here are unvalidated demonstration rules."
         else:
-            return f"ProstateBiopsy Gleason Sentinel: Autonomous Multi-Core ISUP Grade Grouping & Perineural Tracker executive agent online. Zero-PHI air-gapped monitoring active."
+            return f"ProstateBiopsy Gleason Sentinel: Autonomous Multi-Core ISUP Grade Grouping & Perineural Tracker executive demonstration online. No PHI de-identification or clinical validation is guaranteed."

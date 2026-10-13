@@ -1,193 +1,70 @@
 # Prostate Biopsy Gleason Agent
 
-> **Domain:** Digital Pathology & Quantitative Histopathology
-> **Reference Guidelines & Standards:** College of American Pathologists (CAP) Synoptic Protocols & DICOM WSI
+A Python demonstration of multi-agent threshold auditing, with a separate deterministic **Gleason score / ISUP Grade Group lookup** for *pathologist-assigned* primary and secondary prostate biopsy patterns. It is **not** an image-analysis system, autonomous pathology grader, clinically validated diagnostic device, or HIPAA-compliant clinical platform.
 
-<div align="center">
+## Browser application
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+The repository-root `index.html` provides a standalone Grade Group lookup that runs entirely in the browser using `web/grading.js`. Select primary and secondary Gleason patterns (3, 4, or 5), then calculate the score and ISUP Grade Group. No server, cookies, browser storage, analytics, or file upload is required. The browser UI does not process patient data.
 
-</div>
+GitHub Pages deployment is defined in `.github/workflows/pages.yml`; publication requires GitHub Pages to be enabled for GitHub Actions and a successful deployment. A live link is intentionally not claimed until verified.
 
----
+## Python installation and use
 
-## 📖 What It Does
-
-**Prostate Biopsy Gleason Agent** is an advanced analytical and computational platform implementing Multi-Core ISUP Grade Grouping & Perineural Invasion Tracker. It provides autonomous evaluation of prostate biopsy specimens through specialized sub-agents that assess clinical metrics, classify Gleason patterns, and detect biomarker discordance.
-
----
-
-## ⚙️ Key Capabilities & Algorithmic Modules
-
-### 🔬 Core Algorithmic & Evaluation Engines
-
-- **`prostate_gleason.py`** — Standalone domain pathology engine with Gleason grading and pattern recognition
-- **`agents/supervisor.py`** — Enterprise supervisor orchestrating multiple worker evaluations
-- **`agents/workers.py`** — Specialized domain workers:
-  - `InvariantQCWorker` — Primary metric threshold monitoring
-  - `SafetyEscalationWorker` — STAT kinetics & emergency interlock detection
-  - `ProtocolConformanceWorker` — Discordance & anomaly triage
-- **`agents/base.py`** — PHI guard, HMAC-SHA256 audit trail, and security exceptions
-- **`enrichment.py`** — Extended enrichment suite for WHO 2019 compliance, GS7 subtype detection, and pattern 4 tracking
-
----
-
-## 🚀 Installation
+Requires Python 3.10–3.12 (the CI test matrix). From the repository root:
 
 ```bash
-# Clone the repository
-git clone https://github.com/abusuraihsakhri/prostate-biopsy-gleason-agent.git
-cd prostate-biopsy-gleason-agent
-
-# Install dependencies (no required runtime deps for core functionality)
-pip install --editable .
-
-# For full features (FastAPI server, Prometheus):
-pip install fastapi uvicorn pydantic
-
-# For running tests:
-pip install pytest
+python -m pip install -e .
+prostate-biopsy-gleason-engine grade 3 4
+python -m pytest -q
 ```
 
----
+The `grade` command returns the Gleason score and Grade Group; `prostate_biopsy_gleason_agent.grading.grade_group(3, 4)` offers the same deterministic lookup in Python. A 3+4=7 result corresponds to Grade Group 2; 4+3=7 corresponds to Grade Group 3. Gleason 8 (4+4, 3+5, 5+3) corresponds to Group 4; Gleason 9–10 to Group 5.
 
-## 💻 CLI Quickstart & Usage
+### Legacy demonstration workflows
 
-### 1. Guided Interactive Mode
+The repository also preserves separate, generic numeric-threshold audit implementations. **These are operational examples, not accepted prostate-biopsy grading criteria.** They do not derive Gleason patterns from core lengths, tumour percentages, or histology images.
+
 ```bash
-python cli.py audit --task-id CASE-001
+python cli.py audit --task-id DEMO-001 --target SPECIMEN-001 --primary 28 --secondary 14
+python cli.py batch -i your_generic_tasks.csv -o results.csv
+python -m prostate_biopsy_gleason_agent.cli grade 3 4
 ```
 
-### 2. Direct Parameterized Evaluation
-```bash
-python cli.py audit --task-id TASK-001 --target SPECIMEN-01 --primary 28.5 --secondary 14.2 --critical --status DISCORDANT
-```
+The root `cli.py` uses the Pydantic worker supervisor. The installable console command uses the clinical-package interface. The legacy `web/index.html` console requires a compatible local REST backend; if it is unavailable, it reports an error instead of fabricating results.
 
-### 3. Batch Processing
-```bash
-python cli.py batch -i sample.csv -o results.csv
-```
+## Local REST server and container
 
-### 4. System Chat Assistant
-```bash
-python cli.py chat "What is the system status?"
-```
+Install optional server dependencies:
 
-### 5. Audit Trail Verification
 ```bash
-python cli.py verify-audit
-```
-
-### 6. Launch REST API Server
-```bash
+python -m pip install fastapi uvicorn pydantic
+export AUDIT_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
 python cli.py serve --host 127.0.0.1 --port 8000
 ```
 
-### Parameter Reference
-- `--task-id`: Unique task / case identifier
-- `--target`: Specimen or entity identifier
-- `--primary`: Primary measurement or score (float)
-- `--secondary`: Secondary kinetic or confidence score (float)
-- `--critical`: Emergency escalation flag (boolean)
-- `--status`: Status code or phenotype descriptor
+The root server exposes `/health`, `/api/audit`, and `/api/chat` for demonstration use. For Docker, define a strong `AUDIT_SECRET_KEY` in your environment and run `docker compose up --build`. The Compose port binds to **127.0.0.1:8000** by default. Do not expose this unauthenticated demonstration API to untrusted networks.
 
----
+## Privacy and security limits
 
-## 🛡️ Security & Enterprise Architecture
+- Use **synthetic data only**. The rule-based identifier scanner is incomplete and is not a substitute for de-identification or HIPAA Safe Harbor compliance.
+- The HMAC-SHA256 in-memory audit log requires `AUDIT_SECRET_KEY` and verifies individual signatures and predecessor links. It is **not** durable across restarts, an external immutable audit ledger, or a compliance certification.
+- The committed historic Docker signing values must be regarded as compromised and **must never be reused**.
+- The default language-model adapter is a local deterministic mock. Selecting another provider currently does not connect to an external model.
+- Inputs are not used for clinical decision-making, treatment recommendations, or automated notifications.
 
-* **Zero-PHI Outbound Interceptor:** Active regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Required Environment Variable:** `AUDIT_SECRET_KEY` must be set before using audit functionality.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances, Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Input Validation:** All metric values validated as finite numbers (rejects NaN, Inf, None).
-
-### Environment Variables
-
-| Variable | Required | Description |
-|:---------|:---------|:------------|
-| `AUDIT_SECRET_KEY` | Yes | HMAC signing key for audit trail (set before first use) |
-| `MODEL_PROVIDER` | No | LLM provider: `mock`, `ollama`, `claude`, `openai` (default: `mock`) |
-
----
-
-## 🧪 Testing & Verification
+## Tests and deployment
 
 ```bash
-# Run the full test suite (26 tests)
-pytest -v
-
-# Run with coverage
-pytest -v --cov
-
-# Execute high-throughput batch simulation benchmarks
-python simulator.py 1000
+python -m pip install -e . fastapi uvicorn pydantic pytest
+python -m pytest -q
+node web/test_grading.cjs
 ```
 
----
+GitHub Actions tests Python 3.10, 3.11, 3.12, the browser lookup, and a signed-audit self-check. The static GitHub Pages workflow deploys only `index.html` and `web/grading.js` and does **not** deploy FastAPI or expose server-side secrets. No Pyodide/PyScript runtime is necessary because the browser calculation is implemented directly in JavaScript.
 
-## 🐳 Container Deployment
+## References and license
 
-```bash
-# Build and run with Docker Compose (recommended)
-docker-compose up --build
+- [EAU prostate cancer classification, staging and ISUP grade groups](https://uroweb.org/guidelines/prostate-cancer/chapter/classification-and-staging-systems)
+- [College of American Pathologists prostate needle biopsy protocols](https://www.cap.org/protocols-and-guidelines/cancer-protocols/current-cancer-protocols/)
 
-# Or build and run manually
-docker build -t prostate-biopsy-gleason-agent .
-docker run -p 8000:8000 -e AUDIT_SECRET_KEY=your-secret-key prostate-biopsy-gleason-agent
-```
-
----
-
-## 📁 Project Structure
-
-```
-prostate-biopsy-gleason-agent/
-├── agents/                          # Enterprise supervisor & worker modules
-│   ├── __init__.py
-│   ├── api.py                       # FastAPI REST endpoints
-│   ├── base.py                      # PHI guard, audit trail, security
-│   ├── learning.py                  # Bayesian calibration engine
-│   ├── llm_factory.py               # LLM provider abstraction
-│   ├── metrics.py                   # Prometheus metrics collector
-│   ├── models.py                    # Pydantic schemas
-│   ├── streamer.py                  # WebSocket telemetry
-│   ├── supervisor.py                # Master orchestrator
-│   └── workers.py                   # Specialized domain workers
-├── prostate_biopsy_gleason_agent/   # Clinical domain package
-│   ├── __init__.py
-│   ├── agents.py                    # Clinical sub-agents
-│   ├── cli.py                       # Clinical CLI
-│   ├── engine.py                    # Clinical domain rules
-│   ├── models.py                    # Clinical data models
-│   └── server.py                    # Clinical FastAPI server
-├── tests/                           # Test suite
-│   ├── test_enrichment.py           # Enrichment module tests
-│   ├── test_prostate_biopsy_gleason_agent.py  # Agent/worker tests
-│   └── test_prostate_biopsy_gleason_package.py # Package tests
-├── web/
-│   └── index.html                   # Operations dashboard
-├── cli.py                           # Main CLI entry point
-├── prostate_gleason.py              # Standalone domain engine
-├── prostate_gleason_app.py          # Domain engine app entry
-├── prostate_biopsy_gleason_agent_app.py  # Package app entry
-├── enrichment.py                    # Extended enrichment features
-├── simulator.py                     # High-throughput simulator
-├── pyproject.toml                   # Project configuration
-├── Dockerfile                       # Container build
-├── docker-compose.yml               # Container orchestration
-├── sample.csv                       # Sample batch input
-├── sample_payload.json              # Sample API payload
-├── benchmark_dataset.json           # Golden benchmark test cases
-└── openapi_spec.json                # OpenAPI 3.1 specification
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE).

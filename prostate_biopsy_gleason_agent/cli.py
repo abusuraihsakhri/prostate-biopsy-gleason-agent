@@ -71,7 +71,7 @@ def main(argv=None):
         dossier = coordinator.process_case(case)
         print("=" * 80)
         print(f"  PROSTATEBIOPSY GLEASON SENTINEL: AUTONOMOUS MULTI-CORE ISUP GRADE GROUPING & PERINEURAL TRACKER")
-        print(f"  Domain: Digital Pathology | Standard: CAP Cancer Protocols & ASCO/CAP 2023")
+        print(f"  Domain: Digital Pathology | Generic thresholds are demonstrations, not validated clinical rules")
         print(f"  Case: {dossier['case_id']} | Status: [{dossier['overall_status']}] | Total Alerts: {dossier['total_alerts']}")
         print("=" * 80)
         for a in dossier["alerts"]:
