@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Prostate Biopsy Gleason Engine API",
-    "description": "Enterprise Distributed Component Platform (Clinical & Cryptographic AI) adhering to CAP / CLSI / NIST Standards.",
+    "description": "Local demonstration API for generic task threshold checks; it does not perform histologic Gleason classification or clinical diagnoses.",
     "version": "3.0.0-ENTERPRISE",
     "contact": {
       "name": "Dr. Abu Suraih Sakhri",
@@ -22,17 +22,17 @@
     },
     "/metrics": {
       "get": {
-        "summary": "Prometheus operational metrics",
+        "summary": "JSON operational metrics snapshot",
         "responses": {
           "200": {
-            "description": "Prometheus text metrics"
+            "description": "JSON metrics snapshot"
           }
         }
       }
     },
     "/api/audit": {
       "post": {
-        "summary": "Dispatch task payload across specialized workers",
+        "summary": "Evaluate a generic demonstration task, not a prostate biopsy diagnosis",
         "requestBody": {
           "content": {
             "application/json": {
@@ -76,7 +76,7 @@
     },
     "/api/chat": {
       "post": {
-        "summary": "Air-gapped supervisory conversational assistant",
+        "summary": "Deterministic mock query; no external model connection",
         "requestBody": {
           "content": {
             "application/json": {

@@ -41,7 +41,7 @@ class DomainKnowledgeRegistry:
         warnings = []
         for key in payload.keys():
             if any(phi_keyword in key.lower() for phi_keyword in ["patient_name", "ssn", "mrn_raw", "dob_raw"]):
-                warnings.append(f"PHI_DEFENSE_TRIGGERED: Direct identifier '{key}' masked to synthetic token.")
+                warnings.append(f"PHI_DEFENSE_TRIGGERED: Direct identifier '{key}' flagged; no automatic masking was performed.")
         return warnings
 
 class AgentAlert:

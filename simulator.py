@@ -2,18 +2,21 @@
 Distributed Component High-Throughput Traffic & Stress Testing Simulator for Prostate Biopsy Gleason Agent.
 """
 import os
+import secrets
 import time
 import random
 import sys
 
 # Ensure audit key is set (production deployments should set AUDIT_SECRET_KEY env var)
-os.environ.setdefault("AUDIT_SECRET_KEY", "prostate-biopsy-gleason-agent-sim-key-2026")
+os.environ.setdefault("AUDIT_SECRET_KEY", secrets.token_hex(32))
 
 from agents.models import SystemTaskPayload
 from agents.supervisor import SystemSupervisor
 from agents.base import PHIGuard, SecurityException, AuditLogger
 
 def run_simulation(iterations: int = 100):
+    if iterations < 1:
+        raise ValueError("iterations must be a positive integer")
     print(f"Starting Distributed Component Simulation on Prostate Biopsy Gleason Agent ({iterations} tasks)...")
     supervisor = SystemSupervisor(model_provider="mock")
     start_time = time.time()
@@ -62,7 +65,7 @@ def run_simulation(iterations: int = 100):
     print(f"  Routine Outcomes:          {nominal_count} ({nominal_count/iterations*100:.1f}%)")
     print(f"  Elevated Risk Outcomes:    {elevated_count} ({elevated_count/iterations*100:.1f}%)")
     print(f"  Critical Interventions:    {critical_count} ({critical_count/iterations*100:.1f}%)")
-    print(f"  Adversarial PHI Intercepts:{phi_blocked_count} (100% Interception Rate)")
+    print(f"  Synthetic test identifier interceptions: {phi_blocked_count}/{iterations // 25} tested")
     print(f"  HMAC Audit Ledger Blocks:  {len(AuditLogger.get_trail())}")
     print(f"  HMAC Cryptographic Check:  {AuditLogger.verify_integrity()}")
     print("=" * 70)
