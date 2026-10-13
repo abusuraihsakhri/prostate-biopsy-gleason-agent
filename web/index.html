@@ -128,23 +128,23 @@
             <p>Domain: Clinical & Cryptographic AI | Standard: CAP / CLSI / NIST Standards | LabMind-Atlas Architecture</p>
         </div>
         <div>
-            <span class="badge">Air-Gapped Active</span>
-            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Zero-PHI Guard Active</span>
+            <span class="badge">Local API required</span>
+            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Synthetic identifiers only</span>
         </div>
     </div>
 
     <div class="metrics-bar">
         <div class="metric-box">
             <div class="metric-label">System Status</div>
-            <div class="metric-val" style="color: var(--success);" id="m-status">OPTIMAL</div>
+            <div class="metric-val" style="color: var(--success);" id="m-status">UNKNOWN</div>
         </div>
         <div class="metric-box">
             <div class="metric-label">Tasks Processed</div>
-            <div class="metric-val" id="m-tasks">142</div>
+            <div class="metric-val" id="m-tasks">0</div>
         </div>
         <div class="metric-box">
             <div class="metric-label">Audit Blocks Signed</div>
-            <div class="metric-val" id="m-audit">142</div>
+            <div class="metric-val" id="m-audit">0</div>
         </div>
         <div class="metric-box">
             <div class="metric-label">PHI Interceptions</div>
@@ -184,9 +184,7 @@
         <div class="card">
             <h2>📊 Real-Time Consensus Dossier & Audit Log</h2>
             <div class="terminal" id="outputConsole">// Prostate Biopsy Gleason Engine Operations Console Ready
-// Connection established with Air-Gapped Supervisor
-// Cryptographic HMAC-SHA256 audit ledger loaded.
-// Ready for live task payload dispatch...</div>
+// A local backend is required. No results are simulated.</div>
         </div>
     </div>
 
@@ -211,24 +209,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                if (!res.ok) throw new Error("API HTTP " + res.status);
                 const data = await res.json();
                 consoleEl.innerText = JSON.stringify(data, null, 2);
                 document.getElementById('m-tasks').innerText = parseInt(document.getElementById('m-tasks').innerText) + 1;
-                document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
+                if (data.audit_hash) document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
             } catch (err) {
-                consoleEl.innerText = "// Offline / Simulation Output:\n" + JSON.stringify({
-                    dossier_id: "DOSSIER-SIM-" + Math.floor(Math.random()*10000),
-                    system: "prostate-biopsy-gleason-engine",
-                    domain: "Clinical & Cryptographic AI",
-                    task_id: payload.task_id,
-                    overall_urgency: payload.is_critical_flag ? "CRITICAL_STAT_PANIC" : "ELEVATED_RISK",
-                    integrity_status: "DISCORDANT_ANOMALY",
-                    alerts: [
-                        { worker: "InvariantQCWorker", alert: "Primary metric exceeds upper reference bound" },
-                        { worker: "SafetyEscalationWorker", alert: "Critical emergency interlock flag active" }
-                    ],
-                    audit_hash: "HMAC_SHA256_e83f9a72b941d6c381f9"
-                }, null, 2);
+                document.getElementById('m-status').textContent = "UNAVAILABLE";
+                consoleEl.textContent = "Audit not performed: " + err.message +
+                    ". Start the FastAPI backend. No simulated or signed result was produced.";
             }
         }
     </script>

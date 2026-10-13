@@ -15,6 +15,7 @@ import enum
 import sys
 import uuid
 from typing import Dict, Any, List, Optional
+from prostate_biopsy_gleason_agent.parsing import parse_csv_bool
 
 
 class Severity(str, enum.Enum):
@@ -102,7 +103,7 @@ class GleasonPatternClassifierAgent:
     """Specialized Sub-Agent 2 for prostate-biopsy-gleason-agent"""
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
-        is_critical = bool(payload.get("critical_flag", False))
+        is_critical = parse_csv_bool(payload.get("critical_flag", False))
         val2 = _safe_float(payload.get("metric_secondary"), "metric_secondary", 5.0)
         if is_critical or val2 > 12.0:
             alerts.append(
