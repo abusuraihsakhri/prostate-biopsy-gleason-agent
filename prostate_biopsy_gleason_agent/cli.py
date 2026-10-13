@@ -8,6 +8,7 @@ import sys
 from .models import ClinicalCasePayload
 from .agents import BiopsyCoordinator
 from .parsing import parse_csv_bool
+from .grading import grade_group
 
 coordinator = BiopsyCoordinator()
 
@@ -24,6 +25,11 @@ def main(argv=None):
     p_audit.add_argument("--stat", action="store_true")
     p_audit.add_argument("--status", default="DISCORDANT")
 
+    # Deterministic biopsy Gleason pattern lookup
+    p_grade = subparsers.add_parser("grade", help="Map pathologist-assigned Gleason patterns to ISUP Grade Group")
+    p_grade.add_argument("primary_pattern", type=int)
+    p_grade.add_argument("secondary_pattern", type=int)
+
     # Chat
     p_chat = subparsers.add_parser("chat", help="System configuration query")
     p_chat.add_argument("query", nargs="+")
@@ -39,6 +45,19 @@ def main(argv=None):
     p_serve.add_argument("--port", type=int, default=8000)
 
     args = parser.parse_args(argv)
+
+    if args.command == "grade":
+        try:
+            grade = grade_group(args.primary_pattern, args.secondary_pattern)
+        except ValueError as exc:
+            parser.error(str(exc))
+        print(json.dumps({
+            "primary_pattern": grade.primary_pattern,
+            "secondary_pattern": grade.secondary_pattern,
+            "gleason_score": grade.gleason_score,
+            "isup_grade_group": grade.grade_group,
+        }, indent=2))
+        return 0
 
     if args.command == "audit":
         case = ClinicalCasePayload(

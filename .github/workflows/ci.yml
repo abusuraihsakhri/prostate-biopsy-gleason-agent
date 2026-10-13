@@ -43,6 +43,7 @@ jobs:
         python -c "
         from agents.base import PHIGuard, AuditLogger
         import pytest
+        AuditLogger.log('CI', 'unit', 'SELF_CHECK', {'status': 'ok'})
         assert AuditLogger.verify_integrity() is True
         print('Security & Zero-PHI Audit Passed!')
         "

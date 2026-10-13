@@ -45,3 +45,8 @@ def test_nonfinite_rejected(bad):
         SystemTaskPayload(task_id="T",target_identifier="S",primary_metric=bad)
     with pytest.raises(ValueError):
         ClinicalCasePayload("CASE","SYNTH",bad,2.0,"NORMAL")
+
+def test_package_cli_grade_lookup(capsys):
+    from prostate_biopsy_gleason_agent.cli import main
+    assert main(["grade", "3", "4"]) == 0
+    assert '"isup_grade_group": 2' in capsys.readouterr().out
