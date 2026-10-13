@@ -46,3 +46,10 @@ def test_enrichment_suite_unique_keys():
         "Pattern4Tracker",
     }
     assert set(res.keys()) == expected_keys
+
+@pytest.mark.parametrize("invalid", [float("nan"), float("inf"), float("-inf")])
+def test_enrichment_rejects_nonfinite_metrics(invalid):
+    with pytest.raises(ValueError):
+        enrichment_suite.execute_all(primary_val=invalid, secondary_val=0.2)
+    with pytest.raises(ValueError):
+        enrichment_suite.execute_all(primary_val=1.0, secondary_val=invalid)

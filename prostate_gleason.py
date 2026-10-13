@@ -15,6 +15,7 @@ import enum
 import sys
 import uuid
 from typing import Dict, Any, List, Optional
+from prostate_biopsy_gleason_agent.parsing import parse_csv_bool
 
 
 class Severity(str, enum.Enum):
@@ -32,15 +33,15 @@ class Severity(str, enum.Enum):
 class DomainKnowledgeRegistry:
     """Enterprise domain rules, guideline matrices, and evidence benchmarks."""
     SYSTEM_VERSION = "2.0.0-PRO-CLINICAL"
-    ZERO_PHI_COMPLIANCE = True
-    HIPAA_SAFE_HARBOR = "ACTIVE_ON_PREMISES"
+    ZERO_PHI_COMPLIANCE = False
+    HIPAA_SAFE_HARBOR = "NOT_ASSESSED"
 
     @staticmethod
     def audit_security_and_integrity(payload: Dict[str, Any]) -> List[str]:
         warnings = []
         for key in payload.keys():
             if any(phi_keyword in key.lower() for phi_keyword in ["patient_name", "ssn", "mrn_raw", "dob_raw"]):
-                warnings.append(f"PHI_DEFENSE_TRIGGERED: Direct identifier '{key}' masked to synthetic token.")
+                warnings.append(f"PHI_DEFENSE_TRIGGERED: Direct identifier '{key}' flagged; no automatic masking was performed.")
         return warnings
 
 class AgentAlert:
@@ -102,7 +103,7 @@ class GleasonPatternClassifierAgent:
     """Specialized Sub-Agent 2 for prostate-biopsy-gleason-agent"""
     def evaluate(self, payload: Dict[str, Any]) -> List[AgentAlert]:
         alerts = []
-        is_critical = bool(payload.get("critical_flag", False))
+        is_critical = parse_csv_bool(payload.get("critical_flag", False))
         val2 = _safe_float(payload.get("metric_secondary"), "metric_secondary", 5.0)
         if is_critical or val2 > 12.0:
             alerts.append(
@@ -179,7 +180,7 @@ class BiopsyCoordinator:
         if "summary" in q or "status" in q:
             return f"ProstateBiopsy Gleason Sentinel: Autonomous Multi-Core ISUP Grade Grouping & Perineural Tracker currently tracking {len(self.case_registry)} cases in local air-gapped memory."
         elif "guidelines" in q or "protocol" in q:
-            return "All sub-agents operate under validated consensus clinical algorithms and CAP/CLSI/NCCN/WHO standards."
+            return "These demonstrations do not implement validated standards or diagnostic Gleason grading."
         else:
             return f"ProstateBiopsy Gleason Sentinel: Autonomous Multi-Core ISUP Grade Grouping & Perineural Tracker executive agent online. Continuous supervisory monitoring active across all domain parameters."
 

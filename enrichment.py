@@ -5,6 +5,7 @@ Generated based on domain-specific requirements in specifications.
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 import datetime
+import math
 
 # =============================================================================
 # 1. OVERVIEW
@@ -32,18 +33,25 @@ class OverviewEngine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Overview: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Overview: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = OverviewEngineResult(
             feature_name="Overview",
@@ -82,18 +90,25 @@ class Enrichment1GleasonGradeGroupGgg15ClassificationAgent:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Enrichment #1: Gleason Grade Group (GGG) 1-5 Classification Agent: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Enrichment #1: Gleason Grade Group (GGG) 1-5 Classification Agent: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = Enrichment1GleasonGradeGroupGgg15ClassificationAgentResult(
             feature_name="Enrichment #1: Gleason Grade Group (GGG) 1-5 Classification Agent",
@@ -132,18 +147,25 @@ class GradeGroupImplementationEngine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Grade Group Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Grade Group Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = GradeGroupImplementationResult(
             feature_name="Grade Group Implementation",
@@ -182,18 +204,25 @@ class Enrichment2Gs7SubtypeDetection34Vs43Engine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Enrichment #2: GS7 Subtype Detection (3+4 vs 4+3): Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Enrichment #2: GS7 Subtype Detection (3+4 vs 4+3): Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = Enrichment2Gs7SubtypeDetection34Vs43EngineResult(
             feature_name="Enrichment #2: GS7 Subtype Detection (3+4 vs 4+3)",
@@ -232,18 +261,25 @@ class Gs7SubtypeImplementationEngine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"GS7 Subtype Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"GS7 Subtype Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = Gs7SubtypeImplementationResult(
             feature_name="GS7 Subtype Implementation",
@@ -282,18 +318,25 @@ class Enrichment3Who2019ProtocolComplianceCheckerEngine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Enrichment #3: WHO 2019 Protocol Compliance Checker: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Enrichment #3: WHO 2019 Protocol Compliance Checker: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = Enrichment3Who2019ProtocolComplianceCheckerEngineResult(
             feature_name="Enrichment #3: WHO 2019 Protocol Compliance Checker",
@@ -332,18 +375,25 @@ class WhoComplianceImplementationEngine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"WHO Compliance Implementation: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"WHO Compliance Implementation: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = WhoComplianceImplementationResult(
             feature_name="WHO Compliance Implementation",
@@ -382,18 +432,25 @@ class Enrichment4NumberOfCoresWithPattern4TrackingEngine:
         alerts = []
         recs = []
         status = "OPTIMAL"
-        score = round(float(primary_value), 3)
+        try:
+            primary_value = float(primary_value)
+            secondary_value = float(secondary_value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Enrichment metrics must be numeric") from exc
+        if not math.isfinite(primary_value) or not math.isfinite(secondary_value):
+            raise ValueError("Enrichment metrics must be finite")
+        score = round(primary_value, 3)
 
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Enrichment #4: Number of Cores with Pattern 4 Tracking: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Review input and the demonstration threshold; no clinical escalation is performed.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Enrichment #4: Number of Cores with Pattern 4 Tracking: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Review the demonstration threshold and input data.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Input did not exceed the configured demonstration threshold.")
 
         res = Enrichment4NumberOfCoresWithPattern4TrackingEngineResult(
             feature_name="Enrichment #4: Number of Cores with Pattern 4 Tracking",

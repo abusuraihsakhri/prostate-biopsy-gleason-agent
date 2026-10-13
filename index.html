@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Local Gleason Score and ISUP Grade Group lookup from already assessed histological patterns.">
+<title>Prostate Biopsy | ISUP Grade Group Lookup</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172a3b;background:#f4f7fa;line-height:1.55}
+*{box-sizing:border-box}body{margin:0}main{max-width:840px;margin:auto;padding:32px 20px 60px}
+header{padding:0 0 20px;border-bottom:1px solid #ccdae5;margin-bottom:25px}h1{font-size:clamp(1.55rem,4vw,2.3rem);line-height:1.2;margin:8px 0 12px}
+h2{font-size:1.2rem;margin-top:0}p{margin:10px 0 15px}.eyebrow{font-size:.8rem;font-weight:700;letter-spacing:.075em;text-transform:uppercase;color:#345b80}
+.card{background:#fff;border:1px solid #cbd8e4;border-radius:12px;padding:24px;margin:18px 0;box-shadow:0 6px 25px #10243609}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:18px}label{display:block;font-weight:650;margin:0 0 6px}
+select{font:inherit;width:100%;padding:12px;border:1px solid #7d93a7;border-radius:7px;background:white;color:#172a3b}
+button{font:inherit;font-weight:700;background:#14538c;color:white;border:0;border-radius:8px;padding:12px 18px;cursor:pointer;margin-top:20px}
+button:hover{background:#0c3f6d}:focus-visible{outline:3px solid #c67e09;outline-offset:3px}
+.result{font-weight:750;font-size:1.45rem;color:#125f47;margin:0}.muted,footer{color:#4a6074;font-size:.94rem}
+ul{padding-left:23px}li{margin:7px 0}a{color:#104e8e}footer{font-size:.84rem;margin-top:28px}
+@media(max-width:520px){.fields{grid-template-columns:1fr}.card{padding:18px}}
+</style>
+</head>
+<body><main>
+<header><span class="eyebrow">Digital pathology · educational calculator</span>
+<h1>Gleason Score &amp; ISUP Grade Group</h1>
+<p class="muted">Enter two Gleason patterns <strong>already assigned by a qualified pathologist</strong>. This page does not read tissue images, recognize gland architecture, or establish a cancer diagnosis.</p>
+</header>
+<section class="card" aria-labelledby="entry-label">
+<h2 id="entry-label">Pattern-based grade lookup</h2>
+<form id="grade-form"><div class="fields">
+<div><label for="primary">Primary Gleason pattern</label><select id="primary" required>
+<option value="3">Pattern 3</option><option value="4">Pattern 4</option><option value="5">Pattern 5</option>
+</select></div>
+<div><label for="secondary">Secondary / highest applicable pattern</label><select id="secondary" required>
+<option value="3">Pattern 3</option><option value="4" selected>Pattern 4</option><option value="5">Pattern 5</option>
+</select></div></div>
+<button type="submit">Calculate Grade Group</button></form>
+</section>
+<section class="card" aria-labelledby="result-label" aria-live="polite" aria-atomic="true">
+<h2 id="result-label">Result</h2>
+<div id="result" class="muted">Select patterns and calculate. No personal information is required.</div>
+</section>
+<section class="card" aria-labelledby="limitations">
+<h2 id="limitations">Clinical scope and limitations</h2>
+<ul>
+<li>Implements the nine standard combinations of assigned biopsy Gleason patterns 3, 4, and 5 and their ISUP Grade Groups 1–5.</li>
+<li>The designation of architectural patterns and selection of the secondary or highest-grade component must be made according to contemporary biopsy reporting practice.</li>
+<li>Pattern 4 percentage, cribriform carcinoma, IDC-P, and specimen-level or case-level grading are not assessed here.</li>
+<li>No diagnostic conclusions, risk groups, management recommendations, or clinical validation are provided.</li>
+</ul>
+<p class="muted">References: <a href="https://uroweb.org/guidelines/prostate-cancer/chapter/classification-and-staging-systems" target="_blank" rel="noopener noreferrer">EAU classification and grading</a>; <a href="https://www.cap.org/protocols-and-guidelines/cancer-protocols/current-cancer-protocols/" target="_blank" rel="noopener noreferrer">CAP prostate biopsy protocols</a>.</p>
+</section>
+<footer>Operates in-browser with JavaScript, without an API, uploads, analytics, cookies, or browser storage. For education and calculation verification; not validated for autonomous clinical use.</footer>
+</main>
+<script src="./web/grading.js"></script>
+<script>
+(function(){
+"use strict";
+const form=document.getElementById("grade-form"),out=document.getElementById("result");
+form.addEventListener("submit",function(event){
+    event.preventDefault();
+    try{
+        const primary=Number(document.getElementById("primary").value);
+        const secondary=Number(document.getElementById("secondary").value);
+        const grade=window.GleasonGrade.gradeGroup(primary,secondary);
+        const headline=document.createElement("p");
+        headline.className="result";
+        headline.textContent="Gleason "+primary+" + "+secondary+" = "+grade.gleasonScore+" · Grade Group "+grade.gradeGroup;
+        const caveat=document.createElement("p");
+        caveat.textContent="This is a lookup from entered patterns, not a pathology interpretation.";
+        out.replaceChildren(headline,caveat);
+    }catch(err){out.textContent="Cannot calculate: "+err.message}
+});
+})();
+</script>
+</body>
+</html>

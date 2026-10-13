@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "prostate-biopsy-gleason-engine"
+name = "prostate-biopsy-gleason-agent"
 version = "2.0.0"
 description = "ProstateBiopsy Gleason Sentinel: Autonomous Multi-Core ISUP Grade Grouping & Perineural Tracker"
 readme = "README.md"
@@ -24,4 +24,7 @@ prostate-biopsy-gleason-engine = "prostate_biopsy_gleason_agent.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/prostate-biopsy-gleason-engine"
-Repository = "https://github.com/abusuraihsakhri/prostate-biopsy-gleason-engine.git"
+Repository = "https://github.com/abusuraihsakhri/prostate-biopsy-gleason-agent.git"
+
+[tool.setuptools.packages.find]
+include = ["agents*", "prostate_biopsy_gleason_agent*"]

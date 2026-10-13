@@ -7,6 +7,8 @@ import json
 import sys
 from .models import ClinicalCasePayload
 from .agents import BiopsyCoordinator
+from .parsing import parse_csv_bool
+from .grading import grade_group
 
 coordinator = BiopsyCoordinator()
 
@@ -22,6 +24,11 @@ def main(argv=None):
     p_audit.add_argument("--secondary", type=float, default=12.5)
     p_audit.add_argument("--stat", action="store_true")
     p_audit.add_argument("--status", default="DISCORDANT")
+
+    # Deterministic biopsy Gleason pattern lookup
+    p_grade = subparsers.add_parser("grade", help="Map pathologist-assigned Gleason patterns to ISUP Grade Group")
+    p_grade.add_argument("primary_pattern", type=int)
+    p_grade.add_argument("secondary_pattern", type=int)
 
     # Chat
     p_chat = subparsers.add_parser("chat", help="System configuration query")
@@ -39,6 +46,19 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
+    if args.command == "grade":
+        try:
+            grade = grade_group(args.primary_pattern, args.secondary_pattern)
+        except ValueError as exc:
+            parser.error(str(exc))
+        print(json.dumps({
+            "primary_pattern": grade.primary_pattern,
+            "secondary_pattern": grade.secondary_pattern,
+            "gleason_score": grade.gleason_score,
+            "isup_grade_group": grade.grade_group,
+        }, indent=2))
+        return 0
+
     if args.command == "audit":
         case = ClinicalCasePayload(
             case_id=args.case_id,
@@ -51,7 +71,7 @@ def main(argv=None):
         dossier = coordinator.process_case(case)
         print("=" * 80)
         print(f"  PROSTATEBIOPSY GLEASON SENTINEL: AUTONOMOUS MULTI-CORE ISUP GRADE GROUPING & PERINEURAL TRACKER")
-        print(f"  Domain: Digital Pathology | Standard: CAP Cancer Protocols & ASCO/CAP 2023")
+        print(f"  Domain: Digital Pathology | Generic thresholds are demonstrations, not validated clinical rules")
         print(f"  Case: {dossier['case_id']} | Status: [{dossier['overall_status']}] | Total Alerts: {dossier['total_alerts']}")
         print("=" * 80)
         for a in dossier["alerts"]:
@@ -82,7 +102,7 @@ def main(argv=None):
                 primary_metric=float(r.get("metric_primary", r.get("primary_metric", 15.0))),
                 secondary_metric=float(r.get("metric_secondary", r.get("secondary_metric", 5.0))),
                 status_flag=r.get("status_flag", r.get("status_text", "NORMAL")),
-                is_stat=bool(r.get("is_stat", r.get("critical_flag", False))),
+                is_stat=parse_csv_bool(r.get("is_stat", r.get("critical_flag", False))),
             )
             dossier = coordinator.process_case(case)
             row_dict = dict(r)

@@ -4,6 +4,7 @@ Domain: Digital Pathology
 Standard: CAP Cancer Protocols & ASCO/CAP 2023
 """
 import datetime
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any
@@ -33,6 +34,19 @@ class ClinicalCasePayload:
     clinical_notes: str = ""
     biomarkers: Dict[str, Any] = field(default_factory=dict)
     timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+
+    def __post_init__(self):
+        for name in ("primary_metric", "secondary_metric"):
+            value = getattr(self, name)
+            if isinstance(value, bool):
+                raise ValueError(f"{name} must be a finite number")
+            try:
+                number = float(value)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"{name} must be a finite number") from exc
+            if not math.isfinite(number):
+                raise ValueError(f"{name} must be a finite number")
+            setattr(self, name, number)
 
 
 @dataclass
